@@ -91,7 +91,7 @@ $wingetAppsRequired = @(
   @{ Id = "Microsoft.PowerShell"; Name = "PowerShell" },
   @{ Id = "JanDeDobbeleer.OhMyPosh"; Name = "Oh My Posh" },
   @{ Id = "Microsoft.VisualStudioCode"; Name = "Visual Studio Code" },
-  @{ Id = "Google.Cloud.SDK"; Name = "Google Cloud SDK" },
+  @{ Id = "Google.Cloud.SDK"; Name = "Google Cloud SDK" }, # pip install google-cloud-sdk
   @{ Id = "Microsoft.PowerToys"; Name = "Microsoft PowerToys" }
 )
 
@@ -309,8 +309,12 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
 else {
   Write-Host "Python is installed." -ForegroundColor Green
 
-  Write-Host "`n🐍 Upgrading pip, setuptools, and wheel..." -ForegroundColor Yellow
-  Invoke-AdminCommand -ScriptBlock { python -m pip install --upgrade pip setuptools wheel }
+  Write-Host "`n🐍 Ensuring pip is up-to-date first..." -ForegroundColor Yellow
+  Invoke-AdminCommand -ScriptBlock { python -m pip install --upgrade pip }
+
+  Write-Host "`n🐍 Upgrading setuptools and wheel..." -ForegroundColor Yellow
+  Invoke-AdminCommand -ScriptBlock { python -m pip install --upgrade setuptools wheel }
+
 
   # Bulk-install/upgrade pip packages using our pip package list.
   $pipPackageList = ($pipPackagesRequired | ForEach-Object { $_.Package }) -join " "
